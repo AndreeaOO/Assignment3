@@ -2,7 +2,5 @@
 
 public class testingchris
 {
-	public Class1()
-	{
-	}
+	
 }
