@@ -24,17 +24,18 @@ namespace XUnitTest
         /// 
         ////////////////////////////////////////////////////////// 
 
-        [Fact]
-        public void Constraint_ConnectionWithoutRequest_ShouldConnect()
+        [Fact]  //1
+        public void Constraint_ConnectionWithoutRequest_ShouldConnect() 
         {
             var client = Helper.Connect();
             Assert.True(client.Connected);
         }
 
-        /*    Method Tests     */
+        
 
-        [Fact]
-        public void Constraint_RequestWithoutMethod_MissingMethodError()
+        /*    Method Tests     */
+        [Fact]   //2
+        public void Constraint_RequestWithoutMethod_MissingMethodError() 
         {
             
             var client = Helper.Connect();
@@ -43,11 +44,12 @@ namespace XUnitTest
 
             var response = client.ReadResponse();
 
-            Assert.True(response.Status.ToLower().Contains("missing method"));
+            Assert.True(response.Status.ToLower().Contains("missing method"));   
         }
+        
 
-        [Fact]
-        public void Constraint_RequestWithUnknownMethod_IllegalMethodError()
+        [Fact]   //3
+        public void Constraint_RequestWithUnknownMethod_IllegalMethodError() 
         {
             var client = Helper.Connect();
 
@@ -65,12 +67,14 @@ namespace XUnitTest
             Assert.Contains("illegal method", response.Status.ToLower());
         }
 
+
+
         [Theory]
         [InlineData("create")]
         [InlineData("read")]
         [InlineData("update")]
-        [InlineData("delete")]
-        public void Constraint_RequestForCreateReadUpdateDeleteWithoutResource_MissingResourceError(string method)
+        [InlineData("delete")]      //4
+        public void Constraint_RequestForCreateReadUpdateDeleteWithoutResource_MissingResourceError(string method) 
         {
             var client = Helper.Connect();
 
@@ -87,9 +91,12 @@ namespace XUnitTest
             Assert.Contains("missing resource", response.Status.ToLower());
         }
 
+
+
+
         /* Date Tests    */
 
-        [Fact]
+        [Fact]   //5
         public void Constraint_RequestWithoutDate_MissingDateError()
         {
             var client = Helper.Connect();
@@ -99,9 +106,10 @@ namespace XUnitTest
             var response = client.ReadResponse();
 
             Assert.True(response.Status.ToLower().Contains("missing date"));
-        }
+        }  
 
-        [Fact]
+
+        [Fact]   //6
         public void Constraint_RequestWhereDateIsNotUnixTime_IllegalDateError()
         {
             var client = Helper.Connect();
@@ -118,15 +126,18 @@ namespace XUnitTest
             var response = client.ReadResponse();
 
             Assert.Contains("illegal date", response.Status.ToLower());
-        }
+        }   
+
+
+
 
         /* Body Tests    */
 
         [Theory]
         [InlineData("create")]
         [InlineData("update")]
-        [InlineData("echo")]
-        public void Constraint_RequestForCreateUpdateEchoWithoutBody_MissingBodyError(string method)
+        [InlineData("echo")]    //7
+        public void Constraint_RequestForCreateUpdateEchoWithoutBody_MissingBodyError(string method) 
         {
             var client = Helper.Connect();
 
@@ -144,8 +155,8 @@ namespace XUnitTest
         }
 
 
-        [Fact]
-        public void Constraint_RequestUpdateWithoutJsonBody_IllegalBodyError()
+        [Fact]   //8
+        public void Constraint_RequestUpdateWithoutJsonBody_IllegalBodyError() 
         {
             var client = Helper.Connect();
 
@@ -165,9 +176,13 @@ namespace XUnitTest
 
         }
 
+
+
+
         /* Echo Test */
-        [Fact]
-        public void Echo_RequestWithBody_ReturnsBody()
+
+        [Fact]   //9
+        public void Echo_RequestWithBody_ReturnsBody() 
         {
             var client = Helper.Connect();
 
@@ -185,6 +200,10 @@ namespace XUnitTest
 
         }
 
+
+
+
+                
         //////////////////////////////////////////////////////////
         /// 
         /// Testing API 
@@ -193,8 +212,8 @@ namespace XUnitTest
 
         /* Path tests  */
 
-        [Fact]
-        public void Constraint_RequestWithInvalidpath_StatusBadRequest()
+        [Fact]   //10
+        public void Constraint_RequestWithInvalidpath_StatusBadRequest() 
         {
             var client = Helper.Connect();
 
@@ -213,8 +232,8 @@ namespace XUnitTest
             Assert.Equal(expectedResponse.ToJson().ToLower(), response.ToJson().ToLower());
         }
 
-        [Fact]
-        public void Constraint_RequestWithInvalidpathId_StatusBadRequest()
+        [Fact]   //11
+        public void Constraint_RequestWithInvalidpathId_StatusBadRequest() 
         {
             var client = Helper.Connect();
 
@@ -233,8 +252,8 @@ namespace XUnitTest
             Assert.Equal(expectedResponse.ToJson().ToLower(), response.ToJson().ToLower());
         }
 
-        [Fact]
-        public void Constraint_CreateWithPathId_StatusBadRequest()
+        [Fact]   //12
+        public void Constraint_CreateWithPathId_StatusBadRequest() 
         {
             var client = Helper.Connect();
 
@@ -254,8 +273,8 @@ namespace XUnitTest
             Assert.Equal(expectedResponse.ToJson().ToLower(), response.ToJson().ToLower());
         }
 
-        [Fact]
-        public void Constraint_UpdateWithOutPathId_StatusBadRequest()
+        [Fact]   ///13
+        public void Constraint_UpdateWithOutPathId_StatusBadRequest() 
         {
             var client = Helper.Connect();
 
@@ -275,8 +294,8 @@ namespace XUnitTest
             Assert.Equal(expectedResponse.ToJson().ToLower(), response.ToJson().ToLower());
         }
 
-        [Fact]
-        public void Constraint_DeleteWithOutPathId_StatusBadRequest()
+        [Fact]   //14
+        public void Constraint_DeleteWithOutPathId_StatusBadRequest() 
         {
             var client = Helper.Connect();
 
@@ -299,8 +318,8 @@ namespace XUnitTest
 
         /* Read tests */
 
-        [Fact]
-        public void Request_ReadCategories_StatusOkAndListOfCategoriesInBody()
+        [Fact]   //15
+        public void Request_ReadCategories_StatusOkAndListOfCategoriesInBody() 
         {
             var client = Helper.Connect();
 
@@ -330,8 +349,8 @@ namespace XUnitTest
             Assert.Equal(expectedResponse.ToJson(), response.ToJson());
         }
 
-        [Fact]
-        public void Request_ReadCategoryWithValidId_StatusOkAndCategoryInBody()
+        [Fact]   //16
+        public void Request_ReadCategoryWithValidId_StatusOkAndCategoryInBody()  
         {
             var client = Helper.Connect();
 
@@ -354,8 +373,8 @@ namespace XUnitTest
             Assert.Equal(expectedResponse.ToJson(), response.ToJson());
         }
 
-        [Fact]
-        public void Request_ReadCategoryWithInvalidId_StatusNotFound()
+        [Fact]   //17
+        public void Request_ReadCategoryWithInvalidId_StatusNotFound()  
         {
             var client = Helper.Connect();
 
@@ -375,8 +394,8 @@ namespace XUnitTest
 
         /* Update tests  */
 
-        [Fact]
-        public void Request_UpdateCategoryWithValidIdAndBody_StatusUpdated()
+        [Fact]   //18
+        public void Request_UpdateCategoryWithValidIdAndBody_StatusUpdated()  
         {
             var client = Helper.Connect();
 
@@ -410,8 +429,8 @@ namespace XUnitTest
             client.ReadResponse();
         }
 
-        [Fact]
-        public void Request_UpdateCategotyValidIdAndBody_ChangedCategoryName()
+        [Fact] //19
+        public void Request_UpdateCategotyValidIdAndBody_ChangedCategoryName()  
         {
             var client = Helper.Connect();
 
@@ -455,8 +474,8 @@ namespace XUnitTest
             client.ReadResponse();
         }
 
-        [Fact]
-        public void Request_UpdateCategotyInvalidId_NotFound()
+        [Fact]  //20
+        public void Request_UpdateCategotyInvalidId_NotFound()  
         {
             var client = Helper.Connect();
 
@@ -475,9 +494,10 @@ namespace XUnitTest
         }
 
 
+
         /* Create Tests  */
 
-        [Fact]
+        [Fact]   //21
         public void Request_CreateCategoryWithValidBodyArgument_CreateNewCategory()
         {
             var client = Helper.Connect();
@@ -513,9 +533,10 @@ namespace XUnitTest
         }
 
 
+
         /* Delete Tests  */
 
-        [Fact]
+        [Fact]   //22
         public void Request_DeleteCategoryWithValidId_RemoveCategory()
         {
             var client = Helper.Connect();
@@ -545,7 +566,8 @@ namespace XUnitTest
             Assert.Contains("1 ok", response.Status.ToLower());
         }
 
-        [Fact]
+
+        [Fact]   //23
         public void Request_DeleteCategoryWithInvalidId_StatusNotFound()
         {
             var client = Helper.Connect();
