@@ -72,7 +72,7 @@ namespace XUnitTest
                 } while (bytesread == 2048);
 
                 string responseData = Encoding.UTF8.GetString(memStream.ToArray());
-                return JsonConvert.DeserializeObject<Response>(responseData);
+                return FromJson<Response>(responseData);              
             }
         }
 
