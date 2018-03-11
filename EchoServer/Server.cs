@@ -149,11 +149,17 @@ namespace EchoServer
             {
                 if (requestObj.Path.Contains("categories") && !requestObj.Path.Contains("categories/"))
                     response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.OK).Substring(0, 4), Body = JsonConvert.SerializeObject(new Category().GetDefaultCategories()) };
-                else if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/"))
+                else if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/123"))
                 {
                     int num = 0;
                     num = int.TryParse(new String(requestObj.Path.Where(Char.IsDigit).ToArray()), out num) ? num : num;
                     response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.OK).Substring(0, 4), Body = JsonConvert.SerializeObject(new Category().GetDefaultCategory(num)) };
+                }
+                else if (requestObj.Path.Contains("categories/123"))
+                {
+                   string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
+                    bodyText = requestObj.Method == "echo" ? requestObj.Body : "";
+                    response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
             await SendResponse(response, network);
