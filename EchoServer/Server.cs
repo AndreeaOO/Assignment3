@@ -124,8 +124,10 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
-            else if (requestObj.Method != "create" || requestObj.Method != "read" || requestObj.Method != "update" || requestObj.Method != "delete" || requestObj.Method != "echo")
+            else if (requestObj.Method != "create" && requestObj.Method != "read" && requestObj.Method != "update" && requestObj.Method != "delete" && requestObj.Method != "echo")
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
+            else if (IllegalBody(requestObj.Body))
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
 
             // not working - test 6
             else if (IsUnix((requestObj.Date).ToString()))
@@ -175,6 +177,12 @@ namespace EchoServer
             return true;
         }
 
-        
+        public static bool IllegalBody(string s)
+        {
+            if ((s[0] == '{') && (s[s.Length - 1] == '}')) return false;
+            else return true;
         }
+
+
+    }
 }
