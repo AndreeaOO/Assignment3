@@ -126,7 +126,9 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
-            else if (!requestObj.ValidPath() && requestObj.Method != "echo")
+            else if (String.IsNullOrEmpty(requestObj.Body))
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
+            else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path!="testing")
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
