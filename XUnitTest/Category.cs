@@ -5,12 +5,12 @@ using System.Text;
 
 namespace XUnitTest
 {
-           internal class Category
-        {
-            [JsonProperty("cid")]
-            public int Id { get; set; }
-            [JsonProperty("name")]
-            public string Name { get; set; }
-        }
-   
+    internal class Category
+    {
+        [JsonProperty("cid")]
+        public int Id { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+    }
+
 }

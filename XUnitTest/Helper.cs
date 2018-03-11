@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using EchoServer;
 using System.Threading;
+using System.Diagnostics;
 
 namespace XUnitTest
 {
@@ -16,6 +17,7 @@ namespace XUnitTest
     {
 
         private static Server _myServer { get; set; }
+        private static int _QuestionCounter { get; set; } = 0;
 
 
         internal static string ToJson(this object data)
@@ -31,86 +33,53 @@ namespace XUnitTest
         }
 
 
-        #region    Region  - Send and Request ...commented
-        /*
-        internal static void SendRequest(this TcpClient client, string request)
-        {
-            Request requestObj = JsonConvert.DeserializeObject<Request>(request);
-
-            var response = new Response();
-            string statTxt = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST);
-            if (requestObj == null)
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
-            else if (string.IsNullOrEmpty(requestObj.Method))
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
-            else if (string.IsNullOrEmpty(requestObj.Path) && requestObj.Method != "echo")
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATH, ref statTxt);
-            else if (requestObj.Date <= 0)
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
-
-            response = new Response { Body = "", Status = statTxt };
-            var jsonObj = ToJson(response);
-            byte[] msg = Encoding.UTF8.GetBytes(jsonObj);
-            client.GetStream().Write(msg, 0, msg.Length);
-        }
-        */
-
-
-        /*
-    internal static Response ReadResponse(this TcpClient client)
-    {
-        try
-        {
-            var e = client.SendBufferSize;
-            NetworkStream strm = client.GetStream();
-
-
-            var x = strm.DataAvailable;     //todo - currently false
-
-            byte[] resp = new byte[client.ReceiveBufferSize];
-            int bytesread = strm.Read(resp, 0, resp.Length);
-            string responseData = Encoding.UTF8.GetString(resp, 0, bytesread);
-            return FromJson<Response>(responseData);
-        }
-        catch (Exception ex)
-        {
-            var x = ex.Message;
-        }
-        return null;
-    }
-    */
-        #endregion
-
 
         internal static void SendRequest(this TcpClient client, string request)
-        {
-            byte[] buffer = Encoding.UTF8.GetBytes(request);
-            client.GetStream().Write(buffer, 0, buffer.Length);          
-        }
-
-
-
-        internal static Response ReadResponse(this TcpClient client)
         {
             try
-            {                
-                NetworkStream strm = client.GetStream();
-                while (!strm.DataAvailable)
+            {
+                byte[] buffer = Encoding.UTF8.GetBytes(request);
+                client.GetStream().Write(buffer, 0, buffer.Length);
+            }
+            catch (Exception ex)
+            {
+                LogAnError(ex);
+            }           
+        }
+
+
+
+        internal static Response ReadResponse(this TcpClient client, int testCaseCount)
+        {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            string responseData = "";
+            try
+            {
+                using (NetworkStream strm = client.GetStream())
                 {
-                    Thread.Sleep(500);
+                    while (!strm.DataAvailable)
+                    {
+                        if (stopwatch.Elapsed.TotalSeconds > 20)
+                        {
+                            LogAnError(new InvalidOperationException("Client could not receive response, so stopwatch elapsed time reached max allowed"));
+                            return null;
+                        }
+                    }
+                    byte[] resp = new byte[client.ReceiveBufferSize];
+                    int bytesread = strm.Read(resp, 0, resp.Length);
+                    responseData = Encoding.UTF8.GetString(resp, 0, bytesread);
                 }
-             
-                byte[] resp = new byte[client.ReceiveBufferSize];
-                int bytesread = strm.Read(resp, 0, resp.Length);
-                string responseData = Encoding.UTF8.GetString(resp, 0, bytesread);
-                strm.Close();
+               
                 client.Dispose();
-                _myServer.KillServer();               
+                _QuestionCounter++;
+                if (_QuestionCounter == testCaseCount)               
+                _myServer.KillServer();
                 return FromJson<Response>(responseData);
             }
             catch (Exception ex)
             {
-                var x = ex.Message;
+                LogAnError(ex);
             }
             return null;
         }
@@ -129,14 +98,28 @@ namespace XUnitTest
             var client = new TcpClient();
             client.Connect(ipLocalEndPoint);
             return client; */
-
-            _myServer = new Server();
-            _myServer.StartServer();
+            if (_myServer == null)
+            {
+                _QuestionCounter = 0;
+                _myServer = new Server();
+                _myServer.StartServer();
+            }
 
             var client = new TcpClient();
             client.Connect(_myServer._Address, _myServer._Port);
             return client;
         }
+
+
+        internal static void LogAnError(Exception ex)
+        {
+            FileStream fs = new FileStream("TestLogger.txt", FileMode.Append);
+            StreamWriter sw = new StreamWriter(fs);
+            sw.Write("Error at " + DateTime.Now.ToString() + "    -  due to " + ex.Message);
+            sw.Close();
+            fs.Close();
+        }
+
 
 
     }

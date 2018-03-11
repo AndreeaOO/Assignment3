@@ -42,7 +42,7 @@ namespace XUnitTest
 
             client.SendRequest("{}");
 
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             Assert.True(response.Status.ToLower().Contains("missing method"));   
         }
@@ -62,7 +62,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             Assert.Contains("illegal method", response.Status.ToLower());
         }
@@ -86,7 +86,7 @@ namespace XUnitTest
 
             client.SendRequest(request.ToJson());
 
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(4);
 
             Assert.Contains("missing resource", response.Status.ToLower());
         }
@@ -103,7 +103,7 @@ namespace XUnitTest
 
             client.SendRequest("{}");
 
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             Assert.True(response.Status.ToLower().Contains("missing date"));
         }  
@@ -123,7 +123,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             Assert.Contains("illegal date", response.Status.ToLower());
         }   
@@ -149,7 +149,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(3);
 
             Assert.Contains("missing body", response.Status.ToLower());
         }
@@ -169,7 +169,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
 
             Assert.Contains("illegal body", response.Status.ToLower());
@@ -194,7 +194,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             Assert.Equal("Hello World", response.Body);
 
@@ -225,12 +225,14 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             var expectedResponse = new Response { Status = "4 Bad Request" };
 
             Assert.Equal(expectedResponse.ToJson().ToLower(), response.ToJson().ToLower());
         }
+
+
 
         [Fact]   //11
         public void Constraint_RequestWithInvalidpathId_StatusBadRequest() 
@@ -245,12 +247,14 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             var expectedResponse = new Response { Status = "4 Bad Request" };
 
             Assert.Equal(expectedResponse.ToJson().ToLower(), response.ToJson().ToLower());
         }
+
+
 
         [Fact]   //12
         public void Constraint_CreateWithPathId_StatusBadRequest() 
@@ -266,12 +270,14 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             var expectedResponse = new Response { Status = "4 Bad Request" };
 
             Assert.Equal(expectedResponse.ToJson().ToLower(), response.ToJson().ToLower());
         }
+
+
 
         [Fact]   ///13
         public void Constraint_UpdateWithOutPathId_StatusBadRequest() 
@@ -287,12 +293,14 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             var expectedResponse = new Response { Status = "4 Bad Request" };
 
             Assert.Equal(expectedResponse.ToJson().ToLower(), response.ToJson().ToLower());
         }
+
+
 
         [Fact]   //14
         public void Constraint_DeleteWithOutPathId_StatusBadRequest() 
@@ -307,7 +315,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             var expectedResponse = new Response { Status = "4 Bad Request" };
 
@@ -331,7 +339,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             var categories = new List<object>
             {
@@ -349,6 +357,8 @@ namespace XUnitTest
             Assert.Equal(expectedResponse.ToJson(), response.ToJson());
         }
 
+
+
         [Fact]   //16
         public void Request_ReadCategoryWithValidId_StatusOkAndCategoryInBody()  
         {
@@ -362,7 +372,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             var expectedResponse = new Response
             {
@@ -372,6 +382,8 @@ namespace XUnitTest
 
             Assert.Equal(expectedResponse.ToJson(), response.ToJson());
         }
+
+
 
         [Fact]   //17
         public void Request_ReadCategoryWithInvalidId_StatusNotFound()  
@@ -386,10 +398,11 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             Assert.Contains("5 not found", response.Status.ToLower());
         }
+
 
 
         /* Update tests  */
@@ -408,7 +421,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(2);
 
 
             Assert.Contains("3 updated", response.Status.ToLower());
@@ -426,8 +439,11 @@ namespace XUnitTest
             };
 
             client.SendRequest(resetRequest.ToJson());
-            client.ReadResponse();
+            client.ReadResponse(2);
         }
+
+
+
 
         [Fact] //19
         public void Request_UpdateCategotyValidIdAndBody_ChangedCategoryName()  
@@ -443,7 +459,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            client.ReadResponse();
+            client.ReadResponse(3);
 
             client = Helper.Connect();
             var readRequest = new
@@ -454,7 +470,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(readRequest.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(3);
 
             Assert.Equal("BeveragesTesting", response.Body.FromJson<Category>().Name);
 
@@ -471,8 +487,10 @@ namespace XUnitTest
             };
 
             client.SendRequest(resetRequest.ToJson());
-            client.ReadResponse();
+            client.ReadResponse(3);
         }
+
+
 
         [Fact]  //20
         public void Request_UpdateCategotyInvalidId_NotFound()  
@@ -488,7 +506,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             Assert.Contains("5 not found", response.Status.ToLower());
         }
@@ -511,7 +529,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(2);
 
             var category = response.Body.FromJson<Category>();
 
@@ -529,7 +547,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(resetRequest.ToJson());
-            client.ReadResponse();
+            client.ReadResponse(2);
         }
 
 
@@ -550,7 +568,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(request.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(2);
 
             client = Helper.Connect();
             var verifyRequest = new
@@ -561,7 +579,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(verifyRequest.ToJson());
-            response = client.ReadResponse();
+            response = client.ReadResponse(2);
 
             Assert.Contains("1 ok", response.Status.ToLower());
         }
@@ -579,7 +597,7 @@ namespace XUnitTest
             };
 
             client.SendRequest(verifyRequest.ToJson());
-            var response = client.ReadResponse();
+            var response = client.ReadResponse(1);
 
             Assert.Contains("5 not found", response.Status.ToLower());
         }

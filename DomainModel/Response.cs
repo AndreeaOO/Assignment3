@@ -29,7 +29,8 @@ namespace DomainModel
             DEFAULT = 0,
             METHOD = 1,
             PATH = 2,
-            DATE = 3
+            DATE = 3,
+            PATHRESOURSE = 4
         }
 
 
@@ -79,6 +80,9 @@ namespace DomainModel
                     break;
                 case REQUESTERRORFIELD.DATE:
                     code += "missing date";
+                    break;
+                case REQUESTERRORFIELD.PATHRESOURSE:
+                    code += "missing resource";
                     break;
                 case REQUESTERRORFIELD.DEFAULT:
                     code += "missing method, missing path, missing date, missing body";

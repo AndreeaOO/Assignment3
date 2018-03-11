@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -57,6 +58,7 @@ namespace EchoServer
         {
             _Listener = new TcpListener(_Address, _Port);
             _Listener.Start();
+            _Listener.Server.Listen(10);
             StartListeningAsync();
         }
 
@@ -71,6 +73,9 @@ namespace EchoServer
         /// <summary>  </summary>
         private async Task<bool> StartListeningAsync()
         {
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
             while (_KeepListening)
             {
                 try
@@ -79,6 +84,11 @@ namespace EchoServer
                     {
                         using (NetworkStream ns = c.GetStream())
                         {
+                            while (!ns.DataAvailable)
+                            {
+                                if (stopwatch.Elapsed.TotalSeconds > 20)
+                                    break;
+                            }
                             if (ns.DataAvailable)  
                             {
                                 var buffer = new byte[c.ReceiveBufferSize];  
@@ -87,7 +97,7 @@ namespace EchoServer
                                 var request = JsonConvert.DeserializeObject<Request>(payload);
                                 await CreateResponse(request, ns);                              
                             }
-                        }
+                        } 
                     }
                 }
                 catch (Exception ex)
@@ -95,8 +105,6 @@ namespace EchoServer
                     //ToDo
                     var log = ex;
                 }
-
-                Thread.Sleep(500);
             }
             _Listener.Stop();            
             return false;
@@ -112,8 +120,8 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
-            else if (string.IsNullOrEmpty(requestObj.Path) && requestObj.Method != "echo")
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATH, ref statTxt);
+            else if (!requestObj.ValidPath() && requestObj.Method != "echo")
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
 
