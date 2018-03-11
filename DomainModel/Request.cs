@@ -27,7 +27,7 @@ namespace DomainModel
         {
             foreach (char c in Date.ToString().Trim())
             {
-                if ((c < '0' || c > '9' || Date.ToString().Trim().Length <= 10))
+                if ((c < '0' || c > '9' || Date.ToString().Trim().Length < 10))
                     return false;
             }
 
@@ -37,9 +37,14 @@ namespace DomainModel
 
         public bool ValidBody()
         {
-            if ((Body.Trim()[0] == '{') && (Body.Trim()[Body.Trim().Length - 1] == '}')) return true;
-            else return false;
+            if (string.IsNullOrEmpty(Body))
+                return false;
+            if ((Body.Trim()[0] == '{') && (Body.Trim()[Body.Trim().Length - 1] == '}'))
+                return true;
+            else
+                return false;
         }
+
 
         public bool ValidPath()
         {

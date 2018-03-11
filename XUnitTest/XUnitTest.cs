@@ -348,7 +348,7 @@ namespace XUnitTest
                 new {cid = 2, name = "Condiments"},
                 new {cid = 3, name = "Confections"}
             };
-
+            var blah = response.ToJson();
             var expectedResponse = new
             {
                 Status = "1 Ok",
