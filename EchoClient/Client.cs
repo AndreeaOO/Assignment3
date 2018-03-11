@@ -14,7 +14,7 @@ namespace EchoClient
             var client = new TcpClient();
             client.Connect(IPAddress.Parse("127.0.0.1"), 5000);
 
-            var strm = client.GetStream();
+            NetworkStream strm = client.GetStream();
 
             var request = new Request
             {
