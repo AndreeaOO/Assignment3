@@ -30,7 +30,10 @@ namespace DomainModel
             METHOD = 1,
             PATH = 2,
             DATE = 3,
-            PATHRESOURSE = 4
+            PATHRESOURSE = 4,
+            ILLEGALMETHOD = 5,
+            ILLEGALDATE = 6,
+            ILLEGALBODY = 7
         }
 
 
@@ -75,14 +78,23 @@ namespace DomainModel
                 case REQUESTERRORFIELD.METHOD:
                     code += "missing method";
                     break;
+                case REQUESTERRORFIELD.ILLEGALMETHOD:
+                    code += "illegal method";
+                    break;
                 case REQUESTERRORFIELD.PATH:
                     code += "missing path";
                     break;
                 case REQUESTERRORFIELD.DATE:
                     code += "missing date";
                     break;
+                case REQUESTERRORFIELD.ILLEGALDATE:
+                    code += "illegal date";
+                    break;
                 case REQUESTERRORFIELD.PATHRESOURSE:
                     code += "missing resource";
+                    break;
+                case REQUESTERRORFIELD.ILLEGALBODY:
+                    code += "illegal body";
                     break;
                 case REQUESTERRORFIELD.DEFAULT:
                     code += "missing method, missing path, missing date, missing body";

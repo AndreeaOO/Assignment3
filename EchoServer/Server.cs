@@ -124,6 +124,16 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
+            else if (!requestObj.ValidMethod())
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
+            else if (!requestObj.ValidBody())
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
+
+            // not working - test 6
+            // else if (!requestObj.ValidDate())
+            //    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
+
+
 
             var response = new Response { Body = "", Status = statTxt };
             await SendResponse(response, network);
@@ -155,6 +165,6 @@ namespace EchoServer
             return false;
         }
 
-
+        
     }
 }

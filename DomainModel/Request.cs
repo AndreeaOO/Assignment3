@@ -13,15 +13,32 @@ namespace DomainModel
         public string Body { get; set; }
 
 
-        private readonly List<string> _LegalMethods = new List<string>(new string[] { "create", "read", "update", "delete", "echo" });
+        private readonly List<string> _LegalMethods = new List<string>(new string[] { "create", "read", "update", "delete", "echo", "testing" });
 
-        public bool ValidMethod(string s)
+        public bool ValidMethod()
         {
-            if (_LegalMethods.Contains(s.Trim().ToLower()))
+            if (_LegalMethods.Contains(Method.Trim().ToLower()))
                 return true;
             return false;
         }
 
+
+        public bool ValidDate()
+        {
+            foreach (char c in Date.ToString().Trim())
+            {
+                if ((c < '0' || c > '9' || Date.ToString().Trim().Length <= 10))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool ValidBody()
+        {
+            if ((Body.Trim()[0] == '{') && (Body.Trim()[Body.Trim().Length - 1] == '}')) return true;
+            else return false;
+        }
 
         public bool ValidPath()
         {
