@@ -86,7 +86,7 @@ namespace EchoServer
                         {
                             while (!ns.DataAvailable)
                             {
-                                if (stopwatch.Elapsed.TotalSeconds > 20)
+                                if (stopwatch.Elapsed.TotalSeconds > 5)
                                     break;
                             }
                             if (ns.DataAvailable)  
@@ -120,7 +120,9 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
-            else if (!requestObj.ValidPath() && requestObj.Method != "echo")
+            else if (String.IsNullOrEmpty(requestObj.Body))
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
+            else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path!="testing")
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
@@ -128,14 +130,14 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
             else if (!requestObj.ValidBody())
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
-
+            
             // not working - test 6
             // else if (!requestObj.ValidDate())
             //    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
 
 
-
-            var response = new Response { Body = "", Status = statTxt };
+            var bodyText = requestObj.Method == "echo" ? requestObj.Body : "";
+            var response = new Response { Body = bodyText, Status = statTxt };
             await SendResponse(response, network);
             return true;
         }
