@@ -54,13 +54,15 @@ namespace DomainModel
                     break;
                 case "read":
                     var num = new String(p.Where(Char.IsDigit).ToArray());
-                    if (!p.Contains("/categories") && !p.Contains("/categories/" + num))
+                    if(string.IsNullOrEmpty(num) && p.Split(new [] { "categories/" }, StringSplitOptions.None).Length > 1)
+                          return false;
+                    else if (!p.Contains("/categories") && !p.Contains("/categories/" + num))
                         return false;
                     break;
                 case "update":
                 case "delete":
                     var n = new String(p.Where(Char.IsDigit).ToArray());
-                    if (string.IsNullOrEmpty(n) || !p.Contains("/categories/" + n))
+                    if (string.IsNullOrEmpty(n) || string.IsNullOrEmpty(n) || !p.Contains("/categories/" + n))
                         return false;
                     break;              
                 default:

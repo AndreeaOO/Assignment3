@@ -94,7 +94,7 @@ namespace EchoServer
                                 var buffer = new byte[c.ReceiveBufferSize];
                                 int readCnt = ns.Read(buffer, 0, buffer.Length);
                                 string payload = Encoding.UTF8.GetString(buffer, 0, readCnt);
-                                if (!PreventExceptionAndSendResponse(payload, ns))
+                                if (PreventExceptionAndSendResponse(payload, ns))
                                 {
                                     var request = JsonConvert.DeserializeObject<Request>(payload);
                                     await CreateResponse(request, ns);
@@ -141,6 +141,8 @@ namespace EchoServer
 
             var bodyText = requestObj.Method == "echo" ? requestObj.Body : "";
             var response = new Response { Body = bodyText, Status = statTxt };
+            if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")  //CCS: introduced in test 11
+                response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) };
             await SendResponse(response, network);
             return true;
         }
@@ -188,6 +190,13 @@ namespace EchoServer
                     var splitter = ex.Message.Contains("Path 'date'");
                     string statTxt = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.ERROR);
                     StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
+                    var responseObj = new Response { Body = "", Status = statTxt };
+                    SendResponse(responseObj, ns);
+                }
+                else
+                {
+                    string statTxt = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.ERROR);
+                    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
                     var responseObj = new Response { Body = "", Status = statTxt };
                     SendResponse(responseObj, ns);
                 }

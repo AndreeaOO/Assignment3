@@ -55,7 +55,7 @@ namespace DomainModel
                     txt += "Update - ";
                     break;
                 case STATUSCODE.BADREQUEST:
-                    txt += "Bad Request - ";
+                    txt += "Bad Request";
                     break;
                 case STATUSCODE.NOTFOUND:
                     txt += "Not Found - ";
