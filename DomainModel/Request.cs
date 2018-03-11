@@ -23,6 +23,23 @@ namespace DomainModel
         }
 
 
+        public bool ValidDate()
+        {
+            foreach (char c in Date.ToString().Trim())
+            {
+                if ((c < '0' || c > '9' || Date.ToString().Trim().Length <= 10))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public bool ValidBody()
+        {
+            if ((Body.Trim()[0] == '{') && (Body.Trim()[Body.Trim().Length - 1] == '}')) return true;
+            else return false;
+        }
+
         public bool ValidPath()
         {
             if (string.IsNullOrEmpty(Method) || string.IsNullOrEmpty(Path))

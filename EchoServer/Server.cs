@@ -126,12 +126,12 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
             else if (!requestObj.ValidMethod())
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
-            else if (IllegalBody(requestObj.Body))
+            else if (!requestObj.ValidBody())
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
 
             // not working - test 6
-            else if (IsUnix((requestObj.Date).ToString()))
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
+            // else if (!requestObj.ValidDate())
+            //    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
 
 
 
@@ -165,24 +165,6 @@ namespace EchoServer
             return false;
         }
 
-        // check if date is Unix(characters are numbers)
-        private static bool IsUnix(string s)
-        {
-            foreach (char c in s)
-            {
-                if ((c < '0' || c > '9') && (s.Length<=10))
-                    return false;
-            }
-
-            return true;
-        }
-
-        public static bool IllegalBody(string s)
-        {
-            if ((s[0] == '{') && (s[s.Length - 1] == '}')) return false;
-            else return true;
-        }
-
-
+        
     }
 }
