@@ -13,7 +13,7 @@ namespace DomainModel
         public string Body { get; set; }
 
 
-        private readonly List<string> _LegalMethods = new List<string>(new string[] { "create", "read", "update", "delete", "echo", "testing" });
+        private readonly List<string> _LegalMethods = new List<string>(new string[] { "create", "read", "update", "delete", "echo"});
 
         public bool ValidMethod()
         {
