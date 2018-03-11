@@ -95,7 +95,7 @@ namespace DomainModel
                     code += "missing resource";
                     break;
                 case REQUESTERRORFIELD.ILLEGALBODY:
-                    code += "illegal body missing body";
+                    code += "illegal body";
                     break;
                 case REQUESTERRORFIELD.MISSINGBODY:
                     code += "missing body";

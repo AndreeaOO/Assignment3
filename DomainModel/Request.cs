@@ -38,7 +38,7 @@ namespace DomainModel
         public bool ValidBody()
         {
             if (string.IsNullOrEmpty(Body))
-                return false;
+                return true;
             if ((Body.Trim()[0] == '{') && (Body.Trim()[Body.Trim().Length - 1] == '}'))
                 return true;
             else

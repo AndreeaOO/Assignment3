@@ -127,8 +127,8 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
-            else if (String.IsNullOrEmpty(requestObj.Body) && requestObj.Method != "read")
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
+            //else if (String.IsNullOrEmpty(requestObj.Body) && requestObj.Method != "read")
+              //  StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
             else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
@@ -161,7 +161,31 @@ namespace EchoServer
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
-            await SendResponse(response, network);
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "update")
+            {
+                if(requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/123"))
+                    {
+
+                    }
+                else if (requestObj.Path.Contains("categories/123"))
+                {
+                    string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
+                    response = new Response { Body = bodyText, Status = statTxtCate };
+                }
+            }
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "delete")
+            {
+                if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1234"))
+                {
+
+                }
+                else if (requestObj.Path.Contains("categories/1234"))
+                {
+                    string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
+                    response = new Response { Body = bodyText, Status = statTxtCate };
+                }
+            }
+                await SendResponse(response, network);
             return true;
         }
 
