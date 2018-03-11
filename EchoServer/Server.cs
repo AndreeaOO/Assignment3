@@ -89,33 +89,39 @@ namespace EchoServer
                                 if (stopwatch.Elapsed.TotalSeconds > 20)
                                     break;
                             }
-                            if (ns.DataAvailable)  
+                            if (ns.DataAvailable)
                             {
-                                var buffer = new byte[c.ReceiveBufferSize];  
+                                var buffer = new byte[c.ReceiveBufferSize];
                                 int readCnt = ns.Read(buffer, 0, buffer.Length);
                                 string payload = Encoding.UTF8.GetString(buffer, 0, readCnt);
-                                var request = JsonConvert.DeserializeObject<Request>(payload);
-                                await CreateResponse(request, ns);                              
+                                if (!PreventExceptionAndSendResponse(payload, ns))
+                                {
+                                    var request = JsonConvert.DeserializeObject<Request>(payload);
+                                    await CreateResponse(request, ns);
+                                }
+
                             }
-                        } 
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    //ToDo
-                    var log = ex;
+                    //ToDo - log to file
+                    //if (ex is JsonSerializationException)
+                    //else 
                 }
             }
-            _Listener.Stop();            
+            _Listener.Stop();
             return false;
         }
 
+        
 
         /// <summary>  </summary>
         /// <param name="requestObj"></param>
         private async Task<bool> CreateResponse(Request requestObj, NetworkStream network)
-        {            
-            string statTxt = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST);
+        {
+            string statTxt = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST);  //ToDo
             if (ValidateIsNull(requestObj))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method))
@@ -128,18 +134,15 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
             else if (!requestObj.ValidBody())
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
+            else if (!requestObj.ValidDate())      // doesn't reach if Date is sent as a non long data type - test 6
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
 
-            // not working - test 6
-            // else if (!requestObj.ValidDate())
-            //    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
-
-
-
-            var response = new Response { Body = "", Status = statTxt };
+            var bodyText = requestObj.Method == "echo" ? requestObj.Body : "";
+            var response = new Response { Body = bodyText, Status = statTxt };
             await SendResponse(response, network);
             return true;
         }
-             
+
 
 
         /// <summary>  </summary>
@@ -147,7 +150,7 @@ namespace EchoServer
         private async Task<bool> SendResponse(Response responseObj, NetworkStream network)
         {
             var jsonObj = JsonConvert.SerializeObject(responseObj, new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() });
-            byte[] msg = Encoding.UTF8.GetBytes(jsonObj);         
+            byte[] msg = Encoding.UTF8.GetBytes(jsonObj);
             network.Write(msg, 0, msg.Length);
             return true;
         }
@@ -159,12 +162,38 @@ namespace EchoServer
         {
             if (requestObj == null)
                 return true;
-            else if(string.IsNullOrEmpty(requestObj.Body) && requestObj.Date == 0
+            else if (string.IsNullOrEmpty(requestObj.Body) && requestObj.Date == 0
                    && string.IsNullOrEmpty(requestObj.Method) && string.IsNullOrEmpty(requestObj.Path))
                 return true;
             return false;
         }
 
-        
+
+
+        /// <summary>  </summary>
+        /// <param name="payload"></param>
+        /// <param name="ns"></param>
+        private bool PreventExceptionAndSendResponse(string payload, NetworkStream ns)
+        {
+            try
+            {
+                var request = JsonConvert.DeserializeObject<Request>(payload);
+            }
+            catch (Exception ex)
+            {
+                if (ex is JsonSerializationException)
+                {
+                    var splitter = ex.Message.Contains("Path 'date'");
+                    string statTxt = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.ERROR);
+                    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
+                    var responseObj = new Response { Body = "", Status = statTxt };
+                    SendResponse(responseObj, ns);
+                }
+                return false;
+            }
+            return true;
+        }
+
+
     }
 }

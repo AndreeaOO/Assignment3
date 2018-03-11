@@ -34,6 +34,7 @@ namespace DomainModel
             return true;
         }
 
+
         public bool ValidBody()
         {
             if ((Body.Trim()[0] == '{') && (Body.Trim()[Body.Trim().Length - 1] == '}')) return true;
