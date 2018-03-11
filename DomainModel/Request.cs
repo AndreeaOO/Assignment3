@@ -49,8 +49,8 @@ namespace DomainModel
             switch (Method.Trim().ToLower())
             {
                 case "create":
-                    if (!p.Contains("/categories"))
-                        return false;
+                    if (!p.Contains("/categories") || p.Contains("/categories/"))
+                        return false;                 
                     break;
                 case "read":
                     var num = new String(p.Where(Char.IsDigit).ToArray());
