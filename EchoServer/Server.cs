@@ -124,6 +124,9 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
+            else if (requestObj.Method != "create" || requestObj.Method != "read" || requestObj.Method != "update" || requestObj.Method != "delete" || requestObj.Method != "echo")
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
+
 
             var response = new Response { Body = "", Status = statTxt };
             await SendResponse(response, network);
