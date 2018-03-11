@@ -158,7 +158,6 @@ namespace EchoServer
                 else if (requestObj.Path.Contains("categories/123"))
                 {
                    string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
-                    bodyText = requestObj.Method == "echo" ? requestObj.Body : "";
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
