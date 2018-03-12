@@ -244,6 +244,11 @@ namespace EchoServer
                     StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
                     response = new Response { Body = bodyText, Status = statTxt };
                 }
+                else if (requestObj.Path.Contains("/categories") && !requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1"))
+                {
+                    string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST);
+                    response = new Response { Body = null, Status = statTxt };
+                }
                 else if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
                 {
                     Category match = JsonConvert.DeserializeObject<Category>(requestObj.Body);
@@ -258,10 +263,6 @@ namespace EchoServer
                             Body = JsonConvert.SerializeObject(match)
                         };
                     }
-                }
-                else if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1"))
-                {
-
                 }
                 else if (requestObj.Path.Contains("categories/123"))
                 {
