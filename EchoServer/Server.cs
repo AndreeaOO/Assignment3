@@ -159,11 +159,11 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
                 response = new Response { Body = bodyText, Status = statTxt };
             }
-            else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")
+            /*else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")
             {
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATH, ref statTxt);
                 response = new Response { Body = bodyText, Status = statTxt };
-            }
+            }*/
             else if (requestObj.Date <= 0)
             {
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
@@ -205,13 +205,19 @@ namespace EchoServer
                 }
                 else if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
                 {
-                    response = new Response { Body = bodyText, Status = statTxt };
+                    string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST);
+                    response = new Response { Body = null, Status = statTxt };
                 }
             }
             //READ methods
             else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "read") // test #15 & 16
             {
-                if (requestObj.Path.Contains("categories") && !requestObj.Path.Contains("categories/"))
+                if (requestObj.Path.Contains("/xxx"))
+                {
+                    string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST);
+                    response = new Response { Body = bodyText, Status = statTxtCate };
+                }
+                else if (requestObj.Path.Contains("categories") && !requestObj.Path.Contains("categories/"))
                     response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.OK).Substring(0, 4), Body = JsonConvert.SerializeObject(new Category().GetDefaultCategories()) };
                 else if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/123"))
                 {
