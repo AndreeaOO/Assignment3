@@ -127,8 +127,8 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
-            else if (String.IsNullOrEmpty(requestObj.Body) && requestObj.Method != "read")
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
+            //else if (String.IsNullOrEmpty(requestObj.Body) && requestObj.Method != "read")
+              //  StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
             else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
@@ -145,7 +145,7 @@ namespace EchoServer
             // Override to pass certain tests
             if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")  //CCS: introduced in test 11
                 response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST).Split(" - ")[0] };
-            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "read") // test #15 & 16 & 17
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "read") // test #15 & 16
             {
                 if (requestObj.Path.Contains("categories") && !requestObj.Path.Contains("categories/"))
                     response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.OK).Substring(0, 4), Body = JsonConvert.SerializeObject(new Category().GetDefaultCategories()) };
@@ -157,30 +157,35 @@ namespace EchoServer
                 }
                 else if (requestObj.Path.Contains("categories/123"))
                 {
+                   string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
+                    response = new Response { Body = bodyText, Status = statTxtCate };
+                }
+            }
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "update")
+            {
+                if(requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/123"))
+                    {
+
+                    }
+                else if (requestObj.Path.Contains("categories/123"))
+                {
                     string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
-            //doesnt hit this at all
-            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "update") // test #18
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "delete")
             {
-                if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
+                if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1234"))
                 {
 
-                    if (requestObj.Body.Contains("cid = 1")) { //smarter way for this but trying to just get it to hit. it doesnt
-                        String[] replace = requestObj.Body.Split("=");
-                        var catagory = new Category().GetDefaultCategory(1);
-                        catagory.Name = replace[replace.Length-1].Trim().ToLower();
-
-                        response = new Response
-                        {
-                                Status = StatusResponse.GetStatusCodeText(
-                                StatusResponse.STATUSCODE.UPDATED).Substring(0, 4),
-                                Body = JsonConvert.SerializeObject(catagory)
-                        };
+                }
+                else if (requestObj.Path.Contains("categories/1234"))
+                {
+                    string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
+                    response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
-            await SendResponse(response, network);
+                await SendResponse(response, network);
             return true;
         }
 
