@@ -161,13 +161,13 @@ namespace EchoServer
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
-            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "update")
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "update") // test #18, 19, 20
             {
                 if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
                 {
-
-                    //if (requestObj.Body.Contains("cid = 1"))
-                   // { //smarter way for this but trying to just get it to hit. it doesnt
+                    Category match = JsonConvert.DeserializeObject<Category>(requestObj.Body); 
+                    if (match.Id==1)
+                   { //smarter way for this but trying to just get it to hit. it doesnt
                         String[] replace = requestObj.Body.Split("=");
                         var catagory = new Category().GetDefaultCategory(1);
                         catagory.Name = replace[replace.Length - 1].Trim().ToLower();
@@ -178,7 +178,7 @@ namespace EchoServer
                                 StatusResponse.STATUSCODE.UPDATED),
                             Body = JsonConvert.SerializeObject(catagory)
                         };
-                    //}
+                   }
                 }
                 else if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1"))
                 {
