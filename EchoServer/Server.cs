@@ -145,7 +145,6 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
             else if(string.IsNullOrEmpty(requestObj.Path))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
-
             else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATH, ref statTxt);
             else if (requestObj.Date <= 0)
@@ -181,6 +180,10 @@ namespace EchoServer
                 else if (!requestObj.ValidBody())
                 {
                     StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
+                }
+                else if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
+                {
+                    response = new Response { Body = bodyText, Status = statTxt };
                 }
             }
             //READ methods
