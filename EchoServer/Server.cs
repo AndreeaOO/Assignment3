@@ -124,17 +124,20 @@ namespace EchoServer
         {
             string statTxt = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST);  //ToDo
             //Missing Must have elements
+            var bodyText = requestObj.Body;
+            var response = new Response { Body = bodyText, Status = statTxt };
+
             if (ValidateIsNull(requestObj))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method) && !requestObj.ValidPath())
             {
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATH, ref statTxt);
             }
             else if (!requestObj.ValidMethod() && !requestObj.ValidPath())
             {
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATH, ref statTxt);
             }
             else if (string.IsNullOrEmpty(requestObj.Method))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
@@ -142,22 +145,20 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
             else if(string.IsNullOrEmpty(requestObj.Path))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
+
             else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATH, ref statTxt);
             else if (requestObj.Date <= 0)
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
             else if (!requestObj.ValidDate())   //CCS: doesn't reach if Date is sent as a non long data type - test 6
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
 
 
-            var bodyText = requestObj.Body;
-            var response = new Response { Body = bodyText, Status = statTxt };
-
             // Override to pass certain tests
             //if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")  //CCS: introduced in test 11
             //    response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST).Split(" - ")[0] };
             //ECHO method
-            if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "echo") // test #15 & 16
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "echo") // test #15 & 16
             {
                 if (String.IsNullOrEmpty(requestObj.Body))
                 {
@@ -210,6 +211,7 @@ namespace EchoServer
                 else if (!requestObj.ValidBody())
                 {
                     StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
+                    response = new Response { Body = bodyText, Status = statTxt };
                 }
                 else if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
                 {
