@@ -161,20 +161,21 @@ namespace EchoServer
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
+            //doesnt hit this at all
             else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "update") // test #18
             {
-                if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/1categories/123"))
+                if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
                 {
 
-                    if (requestObj.Body.Contains("cid = 1")) {
+                    if (requestObj.Body.Contains("cid = 1")) { //smarter way for this but trying to just get it to hit. it doesnt
                         String[] replace = requestObj.Body.Split("=");
                         var catagory = new Category().GetDefaultCategory(1);
                         catagory.Name = replace[replace.Length-1].Trim().ToLower();
 
                         response = new Response
                         {
-                            Status = StatusResponse.GetStatusCodeText(
-                                StatusResponse.STATUSCODE.OK).Substring(0, 4),
+                                Status = StatusResponse.GetStatusCodeText(
+                                StatusResponse.STATUSCODE.UPDATED).Substring(0, 4),
                                 Body = JsonConvert.SerializeObject(catagory)
                         };
                 }
