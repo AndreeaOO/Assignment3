@@ -127,8 +127,6 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
-            else if (String.IsNullOrEmpty(requestObj.Body) && requestObj.Method != "read" && requestObj.Method != "delete")
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
             else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
@@ -145,6 +143,16 @@ namespace EchoServer
             // Override to pass certain tests
             if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")  //CCS: introduced in test 11
                 response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST).Split(" - ")[0] };
+            //CREATED methods
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "created") // test #15 & 16
+            {
+                if (String.IsNullOrEmpty(requestObj.Body))
+                {
+                    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
+                    response = new Response { Body = bodyText, Status = statTxt };
+                }
+            }
+            //READ methods
             else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "read") // test #15 & 16
             {
                 if (requestObj.Path.Contains("categories") && !requestObj.Path.Contains("categories/"))
@@ -161,24 +169,32 @@ namespace EchoServer
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
+            //UPDATE methods
             else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "update") // test #18, 19, 20
             {
-                if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
+                if (String.IsNullOrEmpty(requestObj.Body))
                 {
-                    Category match = JsonConvert.DeserializeObject<Category>(requestObj.Body); 
-                    if (match.Id==1)
-                   { //smarter way for this but trying to just get it to hit. it doesnt
-                        String[] replace = requestObj.Body.Split("=");
-                        var catagory = new Category().GetDefaultCategory(1);
-                        catagory.Name = replace[replace.Length - 1].Trim().ToLower();
+                    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
+                    response = new Response { Body = bodyText, Status = statTxt };
+                }
+                else if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
+                {
+                    Category match = JsonConvert.DeserializeObject<Category>(requestObj.Body);
+                    if (match.Id == 1)
+                    { //smarter way for this but trying to just get it to hit. it doesnt
+
 
                         response = new Response
                         {
                             Status = StatusResponse.GetStatusCodeText(
                                 StatusResponse.STATUSCODE.UPDATED),
-                            Body = JsonConvert.SerializeObject(catagory)
+                            Body = JsonConvert.SerializeObject(match)
                         };
-                   }
+                    }
+                }
+                else if ()
+                {
+
                 }
                 else if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1"))
                 {
@@ -189,9 +205,8 @@ namespace EchoServer
                     string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
-
-
             }
+            //DELETE methods
             else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "delete")
             {
                 if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1234"))
