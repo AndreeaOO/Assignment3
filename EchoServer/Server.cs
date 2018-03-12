@@ -123,6 +123,7 @@ namespace EchoServer
         private async Task<bool> CreateResponse(Request requestObj, NetworkStream network)
         {
             string statTxt = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST);  //ToDo
+            //Missing Must have elements
             if (ValidateIsNull(requestObj))
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DEFAULT, ref statTxt);
             else if (string.IsNullOrEmpty(requestObj.Method))
@@ -133,8 +134,6 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.DATE, ref statTxt);
             else if (!requestObj.ValidMethod())
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
-            else if (!requestObj.ValidBody() && requestObj.Method != "read")  //CCS: body is not required for reading.....
-                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
             else if (!requestObj.ValidDate())   //CCS: doesn't reach if Date is sent as a non long data type - test 6
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
 
@@ -150,6 +149,10 @@ namespace EchoServer
                 {
                     StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
                     response = new Response { Body = bodyText, Status = statTxt };
+                }
+                else if (!requestObj.ValidBody())
+                {
+                    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
                 }
             }
             //READ methods
@@ -176,6 +179,10 @@ namespace EchoServer
                 {
                     StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
                     response = new Response { Body = bodyText, Status = statTxt };
+                }
+                else if (!requestObj.ValidBody())
+                {
+                    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
                 }
                 else if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
                 {
