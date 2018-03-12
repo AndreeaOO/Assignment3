@@ -46,22 +46,22 @@ namespace DomainModel
             switch (CODE)
             {
                 case STATUSCODE.OK:
-                    txt += "Ok - ";
+                    txt += "Ok";
                     break;
                 case STATUSCODE.CREATED:
-                    txt += "Created - ";
+                    txt += "Created";
                     break;
                 case STATUSCODE.UPDATED:
-                    txt += "Update - ";
+                    txt += "Updated";
                     break;
                 case STATUSCODE.BADREQUEST:
-                    txt += "Bad Request - ";
+                    txt += "Bad Request";
                     break;
                 case STATUSCODE.NOTFOUND:
-                    txt += "Not Found - ";
+                    txt += "Not Found";
                     break;
                 case STATUSCODE.ERROR:
-                    txt += "Error - ";
+                    txt += "Error";
                     break;
                 default:
                     break;
@@ -77,31 +77,31 @@ namespace DomainModel
             switch (FIELD)
             {
                 case REQUESTERRORFIELD.METHOD:
-                    code += "missing method";
+                    code += " - missing method";
                     break;
                 case REQUESTERRORFIELD.ILLEGALMETHOD:
-                    code += "illegal method";
+                    code += " - illegal method";
                     break;
                 case REQUESTERRORFIELD.PATH:
-                    code += "missing path";
+                    code += " - missing path";
                     break;
                 case REQUESTERRORFIELD.DATE:
-                    code += "missing date";
+                    code += " - missing date";
                     break;
                 case REQUESTERRORFIELD.ILLEGALDATE:
-                    code += "illegal date";
+                    code += " - illegal date";
                     break;
                 case REQUESTERRORFIELD.PATHRESOURSE:
-                    code += "missing resource";
+                    code += " - missing resource";
                     break;
                 case REQUESTERRORFIELD.ILLEGALBODY:
-                    code += "illegal body";
+                    code += " - illegal body";
                     break;
                 case REQUESTERRORFIELD.MISSINGBODY:
-                    code += "missing body";
+                    code += " - missing body";
                     break;
                 case REQUESTERRORFIELD.DEFAULT:
-                    code += "missing method, missing path, missing date, missing body";
+                    code += " - missing method, missing path, missing date, missing body";
                     break;
                 default:
                     break;

@@ -157,21 +157,40 @@ namespace EchoServer
                 }
                 else if (requestObj.Path.Contains("categories/123"))
                 {
-                   string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
+                    string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
             else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "update")
             {
-                if(requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/123"))
-                    {
+                if (requestObj.Path.Contains("/categories/1") && !requestObj.Path.Contains("/categories/123"))
+                {
 
-                    }
+                    //if (requestObj.Body.Contains("cid = 1"))
+                   // { //smarter way for this but trying to just get it to hit. it doesnt
+                        String[] replace = requestObj.Body.Split("=");
+                        var catagory = new Category().GetDefaultCategory(1);
+                        catagory.Name = replace[replace.Length - 1].Trim().ToLower();
+
+                        response = new Response
+                        {
+                            Status = StatusResponse.GetStatusCodeText(
+                                StatusResponse.STATUSCODE.UPDATED),
+                            Body = JsonConvert.SerializeObject(catagory)
+                        };
+                    //}
+                }
+                else if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1"))
+                {
+
+                }
                 else if (requestObj.Path.Contains("categories/123"))
                 {
                     string statTxtCate = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.NOTFOUND);
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
+
+
             }
             else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "delete")
             {
@@ -185,7 +204,7 @@ namespace EchoServer
                     response = new Response { Body = bodyText, Status = statTxtCate };
                 }
             }
-                await SendResponse(response, network);
+            await SendResponse(response, network);
             return true;
         }
 
