@@ -140,6 +140,8 @@ namespace EchoServer
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.METHOD, ref statTxt);
             else if (!requestObj.ValidMethod())
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALMETHOD, ref statTxt);
+            else if(string.IsNullOrEmpty(requestObj.Path))
+                StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.PATHRESOURSE, ref statTxt);
             else if (requestObj.Date <= 0)
@@ -147,14 +149,28 @@ namespace EchoServer
             else if (!requestObj.ValidDate())   //CCS: doesn't reach if Date is sent as a non long data type - test 6
                 StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALDATE, ref statTxt);
 
-            var bodyText = requestObj.Method == "echo" ? requestObj.Body : "";
+
+            var bodyText = requestObj.Body;
             var response = new Response { Body = bodyText, Status = statTxt };
-            
+
             // Override to pass certain tests
-            if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")  //CCS: introduced in test 11
-                response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST).Split(" - ")[0] };
+            //if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")  //CCS: introduced in test 11
+            //    response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST).Split(" - ")[0] };
+            //ECHO method
+            if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "echo") // test #15 & 16
+            {
+                if (String.IsNullOrEmpty(requestObj.Body))
+                {
+                    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.MISSINGBODY, ref statTxt);
+                    response = new Response { Body = bodyText, Status = statTxt };
+                }
+                else if (!requestObj.ValidBody())
+                {
+                    StatusResponse.GetStatusCodeReasonText(StatusResponse.REQUESTERRORFIELD.ILLEGALBODY, ref statTxt);
+                }
+            }
             //CREATED methods
-            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "created") // test #15 & 16
+            else if (statTxt == StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST) && requestObj.Method == "create") // test #15 & 16
             {
                 if (String.IsNullOrEmpty(requestObj.Body))
                 {
