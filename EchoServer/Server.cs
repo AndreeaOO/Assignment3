@@ -139,6 +139,7 @@ namespace EchoServer
 
             var bodyText = requestObj.Method == "echo" ? requestObj.Body : "";
             var response = new Response { Body = bodyText, Status = statTxt };
+            
             // Override to pass certain tests
             if (!requestObj.ValidPath() && requestObj.Method != "echo" && requestObj.Path != "testing")  //CCS: introduced in test 11
                 response = new Response { Status = StatusResponse.GetStatusCodeText(StatusResponse.STATUSCODE.BADREQUEST).Split(" - ")[0] };
@@ -198,10 +199,6 @@ namespace EchoServer
                             Body = JsonConvert.SerializeObject(match)
                         };
                     }
-                }
-                else if ()
-                {
-
                 }
                 else if (requestObj.Path.Contains("categories") && requestObj.Path.Contains("categories/") && !requestObj.Path.Contains("categories/1"))
                 {
